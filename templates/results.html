@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Results</h1>
+
+        <section>
+            <h2>Median Months for All Questions</h2>
+            <img src="{{ overall_months_chart }}" alt="Median Months Chart">
+        </section>
+
+        <section>
+            <h2>Median Confidence for All Questions</h2>
+            <img src="{{ overall_confidence_chart }}" alt="Median Confidence Chart">
+        </section>
+
+        <ul>
+        {% for result in results %}
+            <li>
+                <h3>{{ result.question }}</h3>
+                <section>
+                    <h4>Voter Months</h4>
+                    <img src="{{ result.months_chart_path }}" alt="Voter Months Chart">
+                </section>
+                <section>
+                    <h4>Voter Confidence</h4>
+                    <img src="{{ result.confidence_chart_path }}" alt="Voter Confidence Chart">
+                </section>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vote</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Question: {{ question }}</h1>
+        <form method="post" onsubmit="disableButton(this.querySelector('button'))">
+            <label>Confidence,<br>
+                Full - know what to do<br>
+                Medium - partially can be done<br>
+                None - can't start w\o BA:</label>
+            <input type="radio" name="confidence" value="full" required> Full
+            <input type="radio" name="confidence" value="medium" required> Medium
+            <input type="radio" name="confidence" value="none" required> None
+            
+            <label>Months to be done:</label>
+            <input type="number" name="months" required>
+            
+            <button type="submit">Next</button>
+        </form>
+    </div>
+    <script>
+        function disableButton(button) {
+            button.disabled = true;
+            button.innerHTML = "Processing...";
+        }
+    </script>
+</body>
+</html>

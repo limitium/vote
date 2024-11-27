@@ -9,16 +9,31 @@
     <div class="container">
         <h1>Results</h1>
 
+        <!-- Number of Participants -->
+        <h2>Number of Participants: {{ participants_count }}</h2>
+
+        <!-- Total Median Months -->
+        <h2>Quorum total months: {{ total_median_months }}</h2>
+
+        <!-- Divergence Chart -->
+        <section>
+            <h2>Divergence in Months by Question</h2>
+            <img src="{{ divergence_chart }}" alt="Divergence Chart">
+        </section>
+
+        <!-- Overall Median Months Chart -->
         <section>
             <h2>Median Months for All Questions</h2>
             <img src="{{ overall_months_chart }}" alt="Median Months Chart">
         </section>
 
+        <!-- Overall Median Confidence Chart -->
         <section>
             <h2>Median Confidence for All Questions</h2>
             <img src="{{ overall_confidence_chart }}" alt="Median Confidence Chart">
         </section>
 
+        <!-- Individual Results -->
         <ul>
         {% for result in results %}
             <li>

@@ -121,25 +121,40 @@ from statistics import median
 def results():
     results = []
     median_months = []
-    median_confidence_scores = []
     question_titles = []
+    participants_count = len(votes[0]["months"]) if votes[0]["months"] else 0  # Ensure votes exist
 
     # Map confidence levels to numerical values
     confidence_mapping = {"none": 0, "medium": 1, "full": 2}
 
+    divergence_values = []
+    median_confidences = []
+
     for qid, data in votes.items():
+        question_titles.append(questions[qid])
+
+        # Calculate median months
         median_month = median(data["months"]) if data["months"] else 0
         median_months.append(median_month)
 
-        numerical_confidence = [confidence_mapping[c] for c in data["confidence"]]
-        median_confidence = median(numerical_confidence) if numerical_confidence else 0
-        median_confidence_scores.append(median_confidence)
+        # Calculate divergence (range of months)
+        if data["months"]:
+            divergence = max(data["months"]) - min(data["months"])
+        else:
+            divergence = 0
+        divergence_values.append(divergence)
 
-        question_titles.append(questions[qid])
+        # Calculate median confidence
+        confidences = data["confidence"]
+        numerical_confidences = [confidence_mapping[c] for c in confidences]
+        if numerical_confidences:
+            median_confidences.append(median(numerical_confidences))
+        else:
+            median_confidences.append(0)  # Default value if no votes
 
         # Generate Voter ID vs. Months chart
         months_chart_path = f"static/months_chart_{qid}.png"
-        plt.figure(figsize=(14, 7))  # Set chart size to 1024x512
+        plt.figure(figsize=(14, 7))
         plt.bar(range(len(data["months"])), data["months"])
         plt.title(f"Voter Months for Question {qid + 1}")
         plt.xlabel("Voter ID")
@@ -149,8 +164,8 @@ def results():
 
         # Generate Voter ID vs. Confidence chart
         confidence_chart_path = f"static/confidence_chart_{qid}.png"
-        plt.figure(figsize=(14, 7))  # Set chart size to 1024x512
-        plt.bar(range(len(numerical_confidence)), numerical_confidence)
+        plt.figure(figsize=(14, 7))
+        plt.bar(range(len(numerical_confidences)), numerical_confidences)
         plt.title(f"Voter Confidence for Question {qid + 1}")
         plt.xlabel("Voter ID")
         plt.ylabel("Confidence Level (0=None, 1=Medium, 2=Full)")
@@ -163,9 +178,24 @@ def results():
             "confidence_chart_path": confidence_chart_path,
         })
 
+    # Generate overall divergence chart
+    divergence_chart_path = "static/divergence_chart.png"
+    plt.figure(figsize=(14, 7))
+    plt.bar(question_titles, divergence_values)
+    plt.title("Divergence in Months by Question")
+    plt.xlabel("Questions")
+    plt.ylabel("Divergence (Max - Min)")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    plt.savefig(divergence_chart_path)
+    plt.close()
+
+    # Sum of all question medians
+    total_median_months = sum(median_months)
+
     # Generate overall median months chart
     overall_months_chart_path = "static/overall_median_months.png"
-    plt.figure(figsize=(14, 7))  # Set chart size to 1024x512
+    plt.figure(figsize=(14, 7))
     plt.bar(question_titles, median_months)
     plt.title("Median Months by Question")
     plt.xlabel("Questions")
@@ -177,8 +207,8 @@ def results():
 
     # Generate overall median confidence chart
     overall_confidence_chart_path = "static/overall_median_confidence.png"
-    plt.figure(figsize=(14, 7))  # Set chart size to 1024x512
-    plt.bar(question_titles, median_confidence_scores)
+    plt.figure(figsize=(14, 7))
+    plt.bar(question_titles, median_confidences)
     plt.title("Median Confidence by Question")
     plt.xlabel("Questions")
     plt.ylabel("Median Confidence (0=None, 1=Medium, 2=Full)")
@@ -192,10 +222,15 @@ def results():
         results=results,
         overall_months_chart=overall_months_chart_path,
         overall_confidence_chart=overall_confidence_chart_path,
+        divergence_chart=divergence_chart_path,
+        participants_count=participants_count,
+        total_median_months=total_median_months,
     )
 
 
+
+
 if __name__ == "__main__":
-    # Ensure static directory exists for charts
+    # Ensure the server runs on all available network interfaces
     os.makedirs("static", exist_ok=True)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
